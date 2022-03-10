@@ -4,6 +4,7 @@ require('express-async-errors');
 const morgan = require('morgan');
 
 const connectDB = require('./db/connect');
+const authRouter = require('./routes/authRoutes');
 const errorHandlerMiddleware = require('./middleware/error-handler');
 const notFound = require('./middleware/not-found');
 
@@ -12,12 +13,14 @@ dotenv.config();
 const app = express();
 
 //middlewares
-app.use(morgan('tiny'));
+app.use(morgan('dev'));
 app.use(express.json()); //to get access to req.body in post and put requests
 
 app.get('/', (req, res) => {
 	res.send('hello');
 });
+
+app.use('/api/v1/auth', authRouter);
 
 //error handler middlewares
 app.use(notFound);
