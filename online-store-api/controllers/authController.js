@@ -1,6 +1,7 @@
 const { StatusCodes } = require('http-status-codes');
 const User = require('../models/UserModel');
 const { BadRequestError } = require('../errors');
+const generateToken = require('../utils/generateToken');
 
 const registerUser = async (req, res) => {
 	const { email } = req.body;
@@ -11,7 +12,11 @@ const registerUser = async (req, res) => {
 	}
 
 	const user = await User.create(req.body);
-	res.status(StatusCodes.CREATED).json({ user });
+
+	const tokenUser = { user: user.name, userId: user._id, role: user.role };
+	const token = generateToken(tokenUser);
+
+	res.status(StatusCodes.CREATED).json({ user: tokenUser, token });
 };
 
 const loginUser = async (req, res) => {
