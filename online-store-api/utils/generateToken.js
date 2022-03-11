@@ -6,4 +6,15 @@ const generateToken = (payload) => {
 	});
 };
 
-module.exports = generateToken;
+const attachCookiesToResponse = (res, user) => {
+	const token = generateToken(user);
+
+	const oneDay = 1000 * 60 * 60 * 24;
+
+	res.cookie('token', token, {
+		httpOnly: true,
+		expires: new Date(Date.now() + oneDay),
+	});
+};
+
+module.exports = { generateToken, attachCookiesToResponse };
