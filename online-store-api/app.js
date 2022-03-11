@@ -16,7 +16,7 @@ const app = express();
 //middlewares
 app.use(morgan('dev'));
 app.use(express.json()); //to get access to req.body in post and put requests
-app.use(cookieParser()); //get access to cookies in request (sent from browser)
+app.use(cookieParser(process.env.JWT_SECRET)); //get access to cookies in request (sent from browser)
 
 app.get('/', (req, res) => {
 	res.send('hello');
@@ -24,7 +24,8 @@ app.get('/', (req, res) => {
 
 //testing incoming cookie
 // app.get('/api/v1', (req, res) => {
-// 	console.log(req.cookies);
+// 	console.log(req.cookies); //unsigned cookies -> signed: false
+// 	console.log(req.signedCookies); //signed cookies -> signed: true
 // 	res.send('ecomm');
 // });
 
