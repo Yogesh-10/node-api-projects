@@ -1,6 +1,6 @@
 const { StatusCodes } = require('http-status-codes');
 const User = require('../models/UserModel');
-const { generateToken, attachCookiesToResponse } = require('../utils/');
+const { createTokenUser, attachCookiesToResponse } = require('../utils/');
 const { BadRequestError, UnauthenticatedError } = require('../errors');
 
 const registerUser = async (req, res) => {
@@ -13,12 +13,13 @@ const registerUser = async (req, res) => {
 
 	const user = await User.create(req.body);
 
-	const tokenUser = { user: user.name, userId: user._id, role: user.role };
+	const tokenUser = createTokenUser(user);
 
 	// const token = generateToken(tokenUser);
 	// res.status(StatusCodes.CREATED).json({ user: tokenUser, token }); //seding token via json respone
 
 	attachCookiesToResponse(res, tokenUser); //instead of directly sending token via response, we can send token using cookies(this is another approach)
+
 	res.status(StatusCodes.CREATED).json({ user: tokenUser });
 };
 
@@ -34,9 +35,10 @@ const loginUser = async (req, res) => {
 	const isPasswordCorrect = await user.comparePassword(password);
 	if (!isPasswordCorrect) throw new UnauthenticatedError('Invalid credentials');
 
-	const tokenUser = { user: user.name, userId: user._id, role: user.role };
+	const tokenUser = createTokenUser(user);
 	attachCookiesToResponse(res, tokenUser); //instead of directly sending tokne via response, we can send token using cookies(this is another approach)
-	res.status(StatusCodes.CREATED).json({ user: tokenUser });
+
+	res.status(StatusCodes.OK).json({ user: tokenUser });
 };
 
 const logoutUser = async (req, res) => {
@@ -44,6 +46,7 @@ const logoutUser = async (req, res) => {
 		httpOnly: true,
 		expires: new Date(Date.now()),
 	});
+
 	res.status(StatusCodes.OK).json({ msg: 'user logged out!' });
 };
 
