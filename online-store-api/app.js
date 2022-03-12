@@ -8,6 +8,7 @@ const authRouter = require('./routes/authRoutes');
 const errorHandlerMiddleware = require('./middleware/error-handler');
 const notFound = require('./middleware/not-found');
 const cookieParser = require('cookie-parser');
+const userRouter = require('./routes/userRoutes');
 
 dotenv.config();
 
@@ -30,6 +31,7 @@ app.get('/', (req, res) => {
 // });
 
 app.use('/api/v1/auth', authRouter);
+app.use('/api/v1/users', userRouter);
 
 //error handler middlewares
 app.use(notFound);

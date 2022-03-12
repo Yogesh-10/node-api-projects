@@ -6,6 +6,8 @@ const generateToken = (payload) => {
 	});
 };
 
+const isTokenValid = (token) => jwt.verify(token, process.env.JWT_SECRET);
+
 const attachCookiesToResponse = (res, user) => {
 	const token = generateToken(user);
 
@@ -19,4 +21,4 @@ const attachCookiesToResponse = (res, user) => {
 	});
 };
 
-module.exports = { generateToken, attachCookiesToResponse };
+module.exports = { generateToken, attachCookiesToResponse, isTokenValid };

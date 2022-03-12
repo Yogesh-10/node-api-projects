@@ -18,7 +18,7 @@ const registerUser = async (req, res) => {
 	// const token = generateToken(tokenUser);
 	// res.status(StatusCodes.CREATED).json({ user: tokenUser, token }); //seding token via json respone
 
-	attachCookiesToResponse(res, tokenUser); //instead of directly sending tokne via response, we can send token using cookies(this is another approach)
+	attachCookiesToResponse(res, tokenUser); //instead of directly sending token via response, we can send token using cookies(this is another approach)
 	res.status(StatusCodes.CREATED).json({ user: tokenUser });
 };
 
@@ -42,7 +42,7 @@ const loginUser = async (req, res) => {
 const logoutUser = async (req, res) => {
 	res.cookie('token', 'logout', {
 		httpOnly: true,
-		expires: new Date(Date.now() + 1000),
+		expires: new Date(Date.now()),
 	});
 	res.status(StatusCodes.OK).json({ msg: 'user logged out!' });
 };
