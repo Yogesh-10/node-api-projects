@@ -13,7 +13,7 @@ const {
 } = require('../middleware/authentication');
 
 router.get('/', authenticeUser, authorizePermissions('admin'), getAllUsers);
-router.get('/showMe', showCurrentUser);
+router.get('/showMe', authenticeUser, showCurrentUser);
 router.patch('/updateUser', updateUser);
 router.post('/updateUserPassword', updateUserPassword);
 
