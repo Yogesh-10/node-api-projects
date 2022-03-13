@@ -1,5 +1,6 @@
+const path = require('path');
 const { StatusCodes } = require('http-status-codes');
-const { NotFoundError } = require('../errors');
+const { NotFoundError, BadRequestError } = require('../errors');
 const Product = require('../models/ProductModel');
 
 const createProduct = async (req, res) => {
@@ -56,7 +57,31 @@ const deleteProduct = async (req, res) => {
 };
 
 const uploadImage = async (req, res) => {
-	res.send('product controller');
+	//we can use files propery on req obejct, since we use 'express-file-upload' middleware
+	if (!req.files) {
+		throw new BadRequestError('No File Uploaded');
+	}
+
+	const productImage = req.files.image; //the image property on files is what we name in frontend or in postman(while testing), it can be anything, eg: if we name as imageFile, then -> req.files.imageFile
+
+	if (!productImage.mimetype.startsWith('image')) {
+		throw new BadRequestError('Please Upload Image');
+	}
+
+	const maxSize = 1024 * 1024; //1MB
+
+	if (productImage.size > maxSize) {
+		throw new BadRequestError('Please upload image smaller than 1MB');
+	}
+
+	const imagePath = path.join(
+		__dirname,
+		'../public/uploads/' + `${productImage.name}`
+	);
+
+	await productImage.mv(imagePath); //moving file to public/uploads
+
+	res.status(StatusCodes.OK).json({ image: `/uploads/${productImage.name}` });
 };
 
 module.exports = {

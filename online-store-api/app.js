@@ -3,6 +3,7 @@ const dotenv = require('dotenv');
 require('express-async-errors');
 const morgan = require('morgan');
 const cookieParser = require('cookie-parser');
+const expressFileUpload = require('express-fileupload');
 
 const connectDB = require('./db/connect');
 const authRouter = require('./routes/authRoutes');
@@ -19,6 +20,9 @@ const app = express();
 app.use(morgan('dev'));
 app.use(express.json()); //to get access to req.body in post and put requests
 app.use(cookieParser(process.env.JWT_SECRET)); //get access to cookies in request (sent from browser)
+
+app.use(expressFileUpload());
+app.use(express.static('./public'));
 
 app.get('/', (req, res) => {
 	res.send('hello');
