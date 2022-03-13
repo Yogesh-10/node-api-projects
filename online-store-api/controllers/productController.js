@@ -53,7 +53,8 @@ const deleteProduct = async (req, res) => {
 		throw new NotFoundError(`No product with id : ${productId}`);
 	}
 
-	await product.remove();
+	await product.remove(); //we use remove here instead of findOneAndDelete, because remove(), will trigger pre('remove') hook in ProductModel, (check ProductModel)
+	// which will cascade the delete operation to reviews, because if we delete a product, we should also delete reviews associated to that product, there is no point in having reviews without products
 	res.status(StatusCodes.OK).json({ msg: 'Success! Product removed.' });
 };
 

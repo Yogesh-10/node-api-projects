@@ -85,6 +85,11 @@ ProductSchema.virtual('reviews', {
 	foreignField: 'product',
 	justOne: false,
 });
+
+ProductSchema.pre('remove', async function () {
+	await this.model('Review').deleteMany({ product: this._id });
+});
+
 //we can query using virtuals because they are not in DB. so alternative approach is in reviewController (getSingleProductReviews)
 
 module.exports = mongoose.model('Product', ProductSchema);
