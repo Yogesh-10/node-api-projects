@@ -67,7 +67,24 @@ const ProductSchema = new mongoose.Schema(
 			required: true,
 		},
 	},
-	{ timestamps: true }
+	{ timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } }
 );
+
+//virtuals are properties that do not persist on DB.
+
+//we cannot use .populate on reviewController to populate reviews because there is no reference on productModel for reviews,
+//so we setup virtuals so that we can populate reviews on products
+
+// 'reviews' is what we used on populate('reviews') and ref is reference to ReviewModel
+//localField is ProductModel id
+//foriegnField is 'product' which is a property in ReviewModel
+//we set justOne to false because we have to get a list of reviews, not only one review
+ProductSchema.virtual('reviews', {
+	ref: 'Review',
+	localField: '_id',
+	foreignField: 'product',
+	justOne: false,
+});
+//we can query using virtuals because they are not in DB. so alternative approach is in reviewController (getSingleProductReviews)
 
 module.exports = mongoose.model('Product', ProductSchema);
