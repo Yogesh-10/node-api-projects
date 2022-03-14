@@ -58,7 +58,7 @@ const updateReview = async (req, res) => {
 	const review = await Review.findOne({ _id: reviewId });
 
 	if (!review) {
-		throw new CustomError.NotFoundError(`No review with id ${reviewId}`);
+		throw new NotFoundError(`No review with id ${reviewId}`);
 	}
 
 	checkPermissions(req.user, review.user);
@@ -86,7 +86,7 @@ const deleteReview = async (req, res) => {
 	res.status(StatusCodes.OK).json({ msg: 'Success! Review removed' });
 };
 
-//Alternative approach for virtuals, unlike virtuals we can query here whatever we want from DB
+//Alternative approach for virtuals(ProductModel), unlike virtuals we can query here whatever we want from DB
 const getSingleProductReviews = async (req, res) => {
 	const { id: productId } = req.params;
 	const reviews = await Review.find({ product: productId });

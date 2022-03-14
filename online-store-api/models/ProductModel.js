@@ -85,11 +85,13 @@ ProductSchema.virtual('reviews', {
 	foreignField: 'product',
 	justOne: false,
 });
+//we cannot query using virtuals because they are not in DB. so alternative approach is in reviewController (getSingleProductReviews)
 
+//we use remove in productController instead of findOneAndDelete, because remove(), will trigger pre('remove') hook in ProductModel, (check ProductModel)
+// which will cascade the delete operation to reviews, because if we delete a product, we should also delete reviews associated to that product, there is no point in having reviews without products
 ProductSchema.pre('remove', async function () {
+	//using "this" keyword we access this model(ProductModel), but we can also access, other model using model() method
 	await this.model('Review').deleteMany({ product: this._id });
 });
-
-//we can query using virtuals because they are not in DB. so alternative approach is in reviewController (getSingleProductReviews)
 
 module.exports = mongoose.model('Product', ProductSchema);
