@@ -4,6 +4,11 @@ require('express-async-errors');
 const morgan = require('morgan');
 const cookieParser = require('cookie-parser');
 const expressFileUpload = require('express-fileupload');
+const rateLimiter = require('express-rate-limit');
+const helmet = require('helmet');
+const xss = require('xss-clean');
+const cors = require('cors');
+const mongoSanitize = require('express-mongo-sanitize');
 
 const connectDB = require('./db/connect');
 const authRouter = require('./routes/authRoutes');
@@ -17,6 +22,19 @@ const errorHandlerMiddleware = require('./middleware/error-handler');
 dotenv.config();
 
 const app = express();
+
+//security packages
+app.set('trust proxy', 1);
+app.use(
+	rateLimiter({
+		windowMs: 15 * 60 * 1000,
+		max: 60,
+	})
+);
+app.use(helmet());
+app.use(cors());
+app.use(xss());
+app.use(mongoSanitize());
 
 //middlewares
 app.use(morgan('dev'));
