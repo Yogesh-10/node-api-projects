@@ -4,14 +4,14 @@ const { createTokenUser, attachCookiesToResponse } = require('../utils/');
 const { BadRequestError, UnauthenticatedError } = require('../errors');
 
 const registerUser = async (req, res) => {
-	const { email } = req.body;
+	const { email, name, password } = req.body;
 
 	const userAlreadyExists = await User.findOne({ email });
 	if (userAlreadyExists) {
 		throw new BadRequestError('Email already exists');
 	}
 
-	const user = await User.create(req.body);
+	const user = await User.create({ name, email, password });
 
 	const tokenUser = createTokenUser(user);
 
