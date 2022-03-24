@@ -1,11 +1,12 @@
 import axios from 'axios';
 import React, { useContext, useState, useEffect } from 'react';
-import url from './utils/url';
+
 const AppContext = React.createContext();
 
 const AppProvider = ({ children }) => {
 	const [isLoading, setIsLoading] = useState(true);
 	const [user, setUser] = useState(null);
+
 	const saveUser = (user) => {
 		setUser(user);
 	};
@@ -17,7 +18,6 @@ const AppProvider = ({ children }) => {
 	const fetchUser = async () => {
 		try {
 			const { data } = await axios.get(`/api/v1/auth/showMe`);
-			console.log(data);
 			saveUser(data.user);
 		} catch (error) {
 			removeUser();
@@ -36,14 +36,15 @@ const AppProvider = ({ children }) => {
 
 	useEffect(() => {
 		fetchUser();
+		// eslint-disable-next-line
 	}, []);
 
 	return (
 		<AppContext.Provider
 			value={{
 				isLoading,
-				saveUser,
 				user,
+				saveUser,
 				logoutUser,
 			}}
 		>
