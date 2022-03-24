@@ -7,6 +7,7 @@ const {
 	createTokenUser,
 	sendVerificationEmail,
 } = require('../utils');
+const Token = require('../models/TokenModel');
 
 const registerUser = async (req, res) => {
 	const { email, name, password } = req.body;
@@ -51,6 +52,31 @@ const loginUser = async (req, res) => {
 		throw new UnauthenticatedError('Please verify your email');
 	}
 	const tokenUser = createTokenUser(user);
+
+	// create refresh token
+	let refreshToken = '';
+	// check for existing token
+	const existingToken = await Token.findOne({ user: user._id });
+
+	if (existingToken) {
+		const { isValid } = existingToken;
+
+		if (!isValid) {
+			throw new UnauthenticatedError('Invalid Credentials');
+		}
+
+		refreshToken = existingToken.refreshToken;
+		attachCookiesToResponse({ res, user: tokenUser, refreshToken });
+		res.status(StatusCodes.OK).json({ user: tokenUser });
+		return;
+	}
+
+	refreshToken = crypto.randomBytes(40).toString('hex');
+	const userAgent = req.headers['user-agent'];
+	const ip = req.ip;
+	const userToken = { refreshToken, ip, userAgent, user: user._id };
+
+	await Token.create(userToken);
 
 	attachCookiesToResponse(res, tokenUser);
 

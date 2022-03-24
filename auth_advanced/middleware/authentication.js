@@ -1,17 +1,34 @@
-const { UnauthenticatedError } = require('../errors');
-const UnauthorizedError = require('../errors/unauthorized');
+const Token = require('../models/TokenModel');
+const { UnauthenticatedError, UnauthorizedError } = require('../errors');
 const { isTokenValid } = require('../utils');
 
 const authenticateUser = async (req, res, next) => {
-	const token = req.signedCookies.token; //signedCookies is a property on req object and 'token' is the name we set up for cookie in res.cookie
-
-	if (!token) {
-		throw new UnauthenticatedError('Authentication Invalid');
-	}
+	const { accessToken, refreshToken } = req.signedCookies; //signedCookies is a property on req object and 'accessToken' and 'refreshToken is the name we set up for cookie in res.cookie
 
 	try {
-		const { user, userId, role } = isTokenValid(token);
-		req.user = { user, userId, role }; //user, userId, role coming for jwt payload, because we signed the user data in generateToken method
+		if (accessToken) {
+			const payload = isTokenValid(accessToken);
+			req.user = payload.user;
+			return next();
+		}
+		const payload = isTokenValid(refreshToken);
+
+		const existingToken = await Token.findOne({
+			user: payload.user.userId,
+			refreshToken: payload.refreshToken,
+		});
+
+		if (!existingToken || !existingToken?.isValid) {
+			throw new UnauthenticatedError('Authentication Invalid');
+		}
+
+		attachCookiesToResponse({
+			res,
+			user: payload.user,
+			refreshToken: existingToken.refreshToken,
+		});
+
+		req.user = payload.user; //coming for jwt payload, because we signed the user data in generateToken method
 		next();
 	} catch (error) {
 		throw new UnauthenticatedError('Authentication Invalid');
