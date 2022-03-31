@@ -12,4 +12,4 @@ Swagger UI API documentation
 
 Converting Postman Documentation to Docgen API Documentation
 
-deployed to Heroku
+deployed to Heroku.
