@@ -1,4 +1,4 @@
-## node-api-projects
+## Node-API-Projects
 
 This Project contains Basic, Intermediate and Advanced API's using Node, Express and MongoDB
 
